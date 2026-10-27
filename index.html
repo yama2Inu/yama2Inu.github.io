@@ -133,11 +133,11 @@ h2{font-family:var(--mincho);font-weight:800;font-size:clamp(1.4rem,2.4vw,2rem);
 
 /* ---------- 足もと ---------- */
 .foot{border-top:1px solid var(--line);padding:56px 0 calc(48px + env(safe-area-inset-bottom))}
-.foot .shell{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px clamp(24px,5vw,72px);align-items:start}
-.mark{display:flex;flex-direction:row-reverse;gap:10px;align-items:flex-start}
+.foot .shell{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px clamp(24px,5vw,72px);align-items:start}
+.mark{display:flex;flex-direction:row-reverse;gap:10px;align-items:flex-start;grid-column:2;grid-row:1;justify-self:end}
 .mark canvas{width:34px;height:76px}
 .mark b{font-family:var(--mincho);font-weight:800;font-size:1.3rem;letter-spacing:.2em;writing-mode:vertical-rl}
-.foot .info{font-size:.875rem;color:var(--muted)}
+.foot .info{font-size:.875rem;color:var(--muted);grid-column:1;grid-row:1}
 .foot .info p{margin:0 0 14px}
 .foot ul{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:8px 22px}
 
@@ -152,6 +152,8 @@ h2{font-family:var(--mincho);font-weight:800;font-size:clamp(1.4rem,2.4vw,2rem);
   .maker .shell{grid-template-columns:1fr}
   .maker h2{grid-row:auto;writing-mode:horizontal-tb}
   .foot .shell{grid-template-columns:1fr}
+  .mark{grid-column:1}
+  .foot .info{grid-row:2}
 }
 </style>
 </head>
