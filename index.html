@@ -128,8 +128,8 @@ h2{font-family:var(--mincho);font-weight:800;font-size:clamp(1.4rem,2.4vw,2rem);
 /* ---------- 連絡先 ---------- */
 .contact{padding:clamp(48px,8vh,100px) 0 clamp(96px,14vh,160px)}
 .contact dl{display:grid;grid-template-columns:auto 1fr;gap:10px 28px;margin:0;font-size:1.0625rem}
-.contact dt{color:var(--muted)}
-.contact dd{margin:0}
+.contact dt{color:var(--muted);white-space:nowrap}
+.contact dd{margin:0;min-width:0;overflow-wrap:anywhere}
 
 /* ---------- 足もと ---------- */
 .foot{border-top:1px solid var(--line);padding:56px 0 calc(48px + env(safe-area-inset-bottom))}
@@ -151,6 +151,7 @@ h2{font-family:var(--mincho);font-weight:800;font-size:clamp(1.4rem,2.4vw,2rem);
   .work .phone{width:min(200px,56vw);justify-self:center}
   .maker .shell{grid-template-columns:1fr}
   .maker h2{grid-row:auto;writing-mode:horizontal-tb}
+  .contact dl{column-gap:20px}
   .foot .shell{grid-template-columns:1fr}
   .mark{grid-column:1}
   .foot .info{grid-row:2}
