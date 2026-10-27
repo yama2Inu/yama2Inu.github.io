@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex">
+<title>ひつじぷるーむ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
+<style>
+/* ------------------------------------------------------------
+   案C「ひつじぷるーむの縦組み」
+   ブランドが主役。和文の縦組みで名乗り、Mirarm を最初の作品として紹介する。
+   羽根(ぷるーむ)は画像ではない。羽軸と羽枝を線で組み立てて描き、
+   重さ・空気の抵抗・傾きによる滑りで落ちる。指やカーソルを動かすと
+   空気が動いて、羽根が流される。
+
+   色(明るい表示): 磁器 #EEF1F4 / 墨藍 #17203A / 薄墨 #4A5368
+       アクセントは曙 #C4581A の1色だけ(主な導線と、絵巻の朝の端)。
+   表示は明るい色だけ(端末の暗い表示には合わせない)。
+   形: 角は 2px(紙の角)。画面写真だけ iPhone の画面の角。
+   ------------------------------------------------------------ */
+:root{
+  --bg:#EEF1F4;
+  --paper:#F8F9FB;
+  --ink:#17203A;
+  --muted:#4A5368;
+  --line:rgba(23,32,58,.16);
+  --accent:#C4581A;
+  --accent-text:#A3460F;
+  --night-tint:#DCE1EB;
+  --r:2px;
+  --shell:min(1180px, 100% - 2.5rem);
+  --mincho:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --gothic:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--gothic);font-size:16px;line-height:1.9;letter-spacing:.03em;
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-underline-offset:.3em;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.shell{width:var(--shell);margin-inline:auto}
+.tate{writing-mode:vertical-rl;text-orientation:mixed}
+.ph{display:inline-block}
+.shot{width:100%;border-radius:14% / 6.45%;box-shadow:0 30px 60px -32px rgba(23,32,58,.55)}
+
+/* ---------- ヒーロー: 名乗りと羽根 ---------- */
+.hero{position:relative;min-height:100svh;overflow:hidden;touch-action:pan-y}
+#air{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .shell{position:relative;min-height:100svh;pointer-events:none}
+.hero .shell > *{pointer-events:auto}
+.name{
+  position:absolute;top:clamp(48px,9vh,96px);right:0;margin:0;
+  font-family:var(--mincho);font-weight:800;
+  --size:min(7.4rem, 8.2vw, calc((100svh - 150px) / 8.2));
+  font-size:var(--size);line-height:1.1;letter-spacing:.14em;white-space:nowrap;
+}
+.name-sub{
+  position:absolute;top:calc(clamp(48px,9vh,96px) + 2.2em);right:calc(min(7.4rem, 8.2vw, calc((100svh - 150px) / 8.2)) * 1.45);margin:0;white-space:nowrap;
+  font-family:var(--mincho);font-weight:600;font-size:clamp(1rem,1.5vw,1.3rem);letter-spacing:.2em;line-height:1.9;color:var(--muted);
+}
+.first{
+  position:absolute;left:0;bottom:clamp(40px,8vh,88px);margin:0;max-width:26em;
+}
+.first p{margin:0 0 18px;font-size:clamp(1rem,1.3vw,1.125rem)}
+/* ひつじぷるーむの羊(3D版)。名前の由来の文のそばに立ち、落ちてくる羽根を目で追う。
+   押すと羽を広げてふわっと浮く。部品は ./assets/mascot-3d/ */
+.sheep{
+  display:block;width:clamp(112px,10vw,168px);aspect-ratio:192/208;margin:0 0 4px -14px;padding:0;
+  border:0;background:none;color:inherit;cursor:pointer;position:relative;
+  -webkit-tap-highlight-color:transparent;
+}
+.sheep img,.sheep hitsujiplume-mascot-3d{position:absolute;inset:0;width:100%;height:100%}
+.sheep hitsujiplume-mascot-3d{opacity:0;transition:opacity .4s ease}
+.sheep.live hitsujiplume-mascot-3d{opacity:1}
+.sheep.live img{visibility:hidden}
+.sheep:focus-visible{outline-offset:-6px;border-radius:24px}
+.first .go{display:inline-flex;align-items:center;gap:14px;text-decoration:none;font-weight:500}
+.first .go img{width:44px;height:44px;border-radius:24%}
+.first .go span{border-bottom:1px solid var(--accent);padding-bottom:2px}
+.first .go:hover span{color:var(--accent-text)}
+
+.jump{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.9375rem}
+.jump a{text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.jump a:hover{border-color:var(--accent);color:var(--accent-text)}
+h2{font-family:var(--mincho);font-weight:800;font-size:clamp(1.4rem,2.4vw,2rem);letter-spacing:.14em;margin:0 0 28px}
+
+/* ---------- つくったもの。作品が増えたら li を足す ---------- */
+.works{padding:clamp(96px,14vh,160px) 0 clamp(64px,10vh,120px)}
+.work-list{list-style:none;margin:0;padding:0;display:grid;gap:56px}
+.work{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;padding:clamp(24px,4vw,48px);background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
+/* iPhone の縁。Mirarm の夜明けの色(藍 → 薄明の紫 → 朝の橙)を、暗く沈めて細く敷く。外側の細い線も同じ色の並び */
+.phone{position:relative;width:100%;aspect-ratio:1070/2213;border-radius:12.6% / 6.1%;background:linear-gradient(172deg,#1A2246 0%,#272447 40%,#352838 72%,#43301F 100%);
+  filter:drop-shadow(0 28px 36px rgba(2,3,8,.55))}
+.phone>.screen{position:absolute;left:2.6%;top:1.26%;width:94.8%;height:97.48%;
+  border-radius:10.6% / 4.9%;object-fit:cover;background:#05070F}
+.phone::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(172deg,rgba(140,158,230,.45),rgba(110,84,150,.22) 40%,rgba(150,96,90,.18) 70%,rgba(240,140,58,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.work .phone{filter:drop-shadow(0 20px 28px rgba(23,32,58,.24))}
+.work-text{min-width:0;max-width:34em}
+.work-text p{margin:0 0 14px}
+.work-name{display:flex;align-items:center;gap:14px}
+.work-name img{width:56px;height:56px;border-radius:24%}
+.work-name b{font-size:1.6rem;letter-spacing:.02em}
+.work-line{font-family:var(--mincho);font-weight:800;font-size:clamp(1.15rem,1.8vw,1.4rem);letter-spacing:.06em}
+.work-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:18px 0;font-size:.9375rem}
+.work-meta dt{color:var(--muted)}
+.work-meta dd{margin:0}
+.work-links{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.wc-go{color:var(--accent-text);font-weight:500}
+.store{display:inline-block;white-space:nowrap;padding:8px 16px;border:1px solid var(--accent);border-radius:var(--r);color:var(--accent-text);font-weight:500;font-size:.875rem;text-decoration:none}
+.work-sub{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.875rem;color:var(--muted)}
+
+/* ---------- つくっている人 ---------- */
+.maker{padding:clamp(64px,10vh,120px) 0}
+.maker .shell{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px clamp(28px,5vw,72px);align-items:start}
+.maker-body{max-width:34em}
+.maker-body p{margin:0 0 12px;word-break:auto-phrase;text-wrap:pretty}
+
+/* ---------- 連絡先 ---------- */
+.contact{padding:clamp(48px,8vh,100px) 0 clamp(96px,14vh,160px)}
+.contact dl{display:grid;grid-template-columns:auto 1fr;gap:10px 28px;margin:0;font-size:1.0625rem}
+.contact dt{color:var(--muted)}
+.contact dd{margin:0}
+
+/* ---------- 足もと ---------- */
+.foot{border-top:1px solid var(--line);padding:56px 0 calc(48px + env(safe-area-inset-bottom))}
+.foot .shell{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px clamp(24px,5vw,72px);align-items:start}
+.mark{display:flex;flex-direction:row-reverse;gap:10px;align-items:flex-start}
+.mark canvas{width:34px;height:76px}
+.mark b{font-family:var(--mincho);font-weight:800;font-size:1.3rem;letter-spacing:.2em;writing-mode:vertical-rl}
+.foot .info{font-size:.875rem;color:var(--muted)}
+.foot .info p{margin:0 0 14px}
+.foot ul{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:8px 22px}
+
+
+@media (max-width:767px){
+  .name{--size:min(15vw, calc((100svh - 260px) / 8.2));top:72px}
+  .name-sub{top:calc(72px + 2.4em);right:calc(min(15vw, calc((100svh - 260px) / 8.2)) * 1.45)}
+  .first{bottom:40px;right:0}
+  .sheep{width:104px;margin-left:-10px}
+  .work{grid-template-columns:1fr;justify-items:start}
+  .work .phone{width:min(200px,56vw);justify-self:center}
+  .maker .shell{grid-template-columns:1fr}
+  .maker h2{grid-row:auto;writing-mode:horizontal-tb}
+  .foot .shell{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<main>
+  <section class="hero" aria-labelledby="name">
+    <canvas id="air" aria-hidden="true"></canvas>
+    <div class="shell">
+      <h1 id="name" class="name tate">ひつじぷるーむ</h1>
+      <p class="name-sub tate">ひつぷる</p>
+      <div class="first">
+        <button class="sheep" type="button" aria-label="羊のぷるーむ。押すと、羽を広げてふわっと浮きます"><img src="./assets/mascot-3d/assets/sheep-static.png" width="192" height="208" alt=""></button>
+        <p>アプリをつくっています。</p>
+        <nav class="jump" aria-label="このページの中">
+          <a href="#works">つくったもの</a><a href="#maker">つくっている人</a><a href="#contact">連絡先</a>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="works" id="works" aria-labelledby="works-h">
+    <div class="shell">
+      <h2 id="works-h">つくったもの</h2>
+      <ul class="work-list">
+        <li class="work">
+          <div class="phone">
+            <img class="screen" src="./assets/screens/alarm-list.webp" width="644" height="1400" alt="Mirarmのアラーム一覧" loading="lazy">
+            
+          </div>
+          <div class="work-text">
+            <p class="work-name"><img src="./assets/brand/mirarm-icon-512.webp" alt="" width="56" height="56"><b>Mirarm</b></p>
+            <p class="work-line">洗面所に行くまで、止まらない目覚まし</p>
+            <p>鏡の前まで行くと、止まる目覚まし。時刻を決めて、好きな音を選んで。Mirarmが、布団から起き上がる朝の一歩を支えます。</p>
+            <dl class="work-meta">
+              <dt>対応</dt><dd>iPhone</dd>
+              <dt>料金</dt><dd>無料(Mirarm Proは10月28日から月額 ¥100・買い切り ¥400)</dd>
+            </dl>
+            <p class="work-links"><a class="wc-go" href="mirarm/">Mirarmのページへ</a><a class="store" href="https://apps.apple.com/jp/app/mirarm/id6803631242" target="_blank" rel="noopener">App Storeでダウンロード</a></p>
+            <p class="work-sub"><a href="https://yama2inu.github.io/mirarm-help/">ヘルプ</a><a href="https://yama2inu.github.io/mirarm-legal/terms.html">利用規約</a><a href="https://yama2inu.github.io/mirarm-legal/privacy.html">プライバシーポリシー</a></p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="maker" id="maker" aria-labelledby="maker-h">
+    <div class="shell">
+      <h2 id="maker-h" class="tate">つくっている人</h2>
+      <div class="maker-body">
+        <p>個人でアプリをつくっています。</p>
+        <p>頭の中のアイデアが、形になっていく。その瞬間がいちばん楽しくて、手を動かしています。</p>
+        <p>最初につくったのは、二度寝しがちな自分のための目覚まし、Mirarmです。</p>
+        <p>上にいる子は、羊のぷるーむ。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contact-h">
+    <div class="shell">
+      <h2 id="contact-h">連絡先</h2>
+      <dl>
+        <dt>お知らせ</dt><dd><a href="https://x.com/hitsujiplume">X @hitsujiplume</a></dd>
+        <dt>お問い合わせ</dt><dd><a href="mailto:yamainustudio@gmail.com">yamainustudio@gmail.com</a></dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="mark"><b>ひつじぷるーむ</b><canvas id="mark" width="68" height="152" aria-hidden="true"></canvas></div>
+    <div class="info"><small>© 2026 hitsujiplume</small></div>
+  </div>
+</footer>
+
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const params = new URLSearchParams(location.search);
+  const INK = '23,32,58';
+  const ink = a => `rgba(${INK},${a})`;
+
+  /* ---------- 羽根を描く ----------
+     羽軸(まんなかの軸)から、先端の側へ斜めに羽枝を何本も伸ばす。
+     ところどころ羽枝がまとまって割れ、根元には綿羽がふわっと付く。 */
+  function mulberry32(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function drawPlume(ctx, L, seed){
+    const rnd = mulberry32(seed);
+    const bend = L * 0.045;
+    const shaft = s => [Math.sin(s * Math.PI * 0.85) * bend, -s * L];
+    const tan = s => { const b = shaft(Math.min(1, s + 0.005)), c = shaft(Math.max(0, s - 0.005)); const dx = b[0] - c[0], dy = b[1] - c[1]; const l = Math.hypot(dx, dy); return [dx / l, dy / l]; };
+    ctx.lineCap = 'round';
+    for (const side of [-1, 1]) {
+      const W = L * (side < 0 ? 0.27 : 0.21);
+      const n = Math.round(L * 0.8);
+      let gap = 0;
+      for (let i = 0; i < n; i++) {
+        const s = 0.2 + 0.8 * (i + rnd() * 0.6) / n;
+        const u = (s - 0.2) / 0.8;
+        const env = Math.pow(Math.sin(Math.PI * Math.min(1, u * 0.92 + 0.04)), 0.7) * (1 - Math.pow(u, 6) * 0.5);
+        if (gap <= 0 && rnd() < 0.035) gap = 2 + Math.floor(rnd() * 3);
+        const split = gap > 0 ? 0.22 : 0; gap--;
+        const len = W * env * (0.88 + 0.24 * rnd());
+        const [px, py] = shaft(s), [tx, ty] = tan(s);
+        const nx = -ty * side, ny = tx * side;
+        const a = 0.62 + split + (rnd() - 0.5) * 0.08 + u * 0.25;
+        const dx = nx * Math.cos(a) + tx * Math.sin(a), dy = ny * Math.cos(a) + ty * Math.sin(a);
+        ctx.strokeStyle = ink(0.34 + 0.22 * rnd());
+        ctx.lineWidth = 0.55 + rnd() * 0.35;
+        ctx.beginPath(); ctx.moveTo(px, py);
+        ctx.quadraticCurveTo(px + dx * len * 0.55 + tx * len * 0.16, py + dy * len * 0.55 + ty * len * 0.16, px + dx * len, py + dy * len);
+        ctx.stroke();
+      }
+    }
+    for (let i = 0; i < Math.round(L * 0.5); i++) {
+      const s = 0.04 + rnd() * 0.2;
+      const side = rnd() < 0.5 ? -1 : 1;
+      const [px, py] = shaft(s), [tx, ty] = tan(s);
+      const nx = -ty * side, ny = tx * side;
+      const len = L * (0.07 + rnd() * 0.15);
+      const a = 0.15 + rnd() * 1.0;
+      const dx = nx * Math.cos(a) + tx * Math.sin(a), dy = ny * Math.cos(a) + ty * Math.sin(a);
+      const w = len * 0.35;
+      ctx.strokeStyle = ink(0.14 + 0.16 * rnd());
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(px, py);
+      ctx.bezierCurveTo(px + dx * len * 0.4 + (rnd() - 0.5) * w, py + dy * len * 0.4 + (rnd() - 0.5) * w,
+                        px + dx * len * 0.8 + (rnd() - 0.5) * w, py + dy * len * 0.8 + (rnd() - 0.5) * w,
+                        px + dx * len + tx * len * 0.2, py + dy * len + ty * len * 0.2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = ink(0.85);
+    ctx.beginPath();
+    const m = 60;
+    for (let i = 0; i <= m; i++) { const s = i / m * 0.98; const [x, y] = shaft(s); const w = Math.min(1, s * 18) * ((1 - s) * 1.5 + 0.25); i ? ctx.lineTo(x - w, y) : ctx.moveTo(x - w, y); }
+    for (let i = m; i >= 0; i--) { const s = i / m * 0.98; const [x, y] = shaft(s); const w = Math.min(1, s * 18) * ((1 - s) * 1.5 + 0.25); ctx.lineTo(x + w, y); }
+    ctx.closePath(); ctx.fill();
+  }
+
+  /* 足もとの印(静止) */
+  (() => {
+    const m = document.getElementById('mark'); const x = m.getContext('2d');
+    x.scale(2, 2); x.translate(17, 72); x.rotate(0.18); drawPlume(x, 64, 7);
+  })();
+
+  /* ---------- 羽根と空気 ---------- */
+  const hero = document.querySelector('.hero');
+  const cv = document.getElementById('air');
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1, L = 150;
+  let sprite, shadow;
+  function makeSprites(){
+    L = innerWidth < 768 ? 130 : 210;
+    const sw = Math.ceil(L * 0.9), shh = Math.ceil(L * 1.25);
+    sprite = document.createElement('canvas'); sprite.width = sw * dpr; sprite.height = shh * dpr;
+    const sx = sprite.getContext('2d'); sx.scale(dpr, dpr); sx.translate(sw * 0.5, shh * 0.92); drawPlume(sx, L, 7);
+    // 影はぼかした羽根。低い解像度で描いて引き伸ばす
+    shadow = document.createElement('canvas'); shadow.width = Math.ceil(sw / 6); shadow.height = Math.ceil(shh / 6);
+    const hx = shadow.getContext('2d'); hx.filter = 'blur(1px)'; hx.drawImage(sprite, 0, 0, shadow.width, shadow.height);
+  }
+  function resize(){
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = hero.clientWidth; H = hero.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    makeSprites();
+    floor = H - (innerWidth < 768 ? 28 : 36);
+    wake();
+  }
+
+  // 羽根の状態。th=0 で先端が真上。phi は長い軸まわりの回転(見かけの幅が変わる)
+  const P = { x: 0, y: 0, vx: 0, vy: 0, th: 0.35, om: 0, phi: 0.6, phid: 0.4 };
+  let floor = 0;
+  const puffs = [];
+  const prng = mulberry32(42);
+  const G = 70, K = 1.9;           // 重さと空気の抵抗。落ちる速さはおよそ G/K = 37px/秒
+  function air(x, y, t){
+    let ux = Math.sin(t * 0.27) * 6 + Math.sin(t * 0.71 + 1.3) * 3, uy = Math.sin(t * 0.43) * 3;
+    for (const p of puffs) {
+      const age = t - p.t, f = Math.exp(-age / 0.8);
+      const dx = x - p.x, dy = y - p.y, w = Math.exp(-(dx * dx + dy * dy) / (p.r * p.r)) * f;
+      ux += p.vx * w; uy += p.vy * w;
+    }
+    return [ux, uy];
+  }
+  let landed = false, shed = 0;
+  function step(dt, t){
+    const half = L * 0.5;
+    const sx = Math.sin(P.th), cy = Math.cos(P.th);
+    const tipX = P.x + sx * half, tipY = P.y - cy * half;
+    const baseX = P.x - sx * half, baseY = P.y + cy * half;
+    const [ux, uy] = air(P.x, P.y, t), [utx, uty] = air(tipX, tipY, t), [ubx, uby] = air(baseX, baseY, t);
+    const rvx = ux - P.vx, rvy = uy - P.vy, rv = Math.hypot(rvx, rvy);
+    // 抵抗は面の向きで変わる。広い面に当たる空気ほど強く効く
+    const flat = 0.55 + 0.45 * Math.abs(Math.cos(P.phi));
+    let ax = rvx * K * flat, ay = rvy * K * flat + G;
+    // 落ちる羽根の後ろには渦が左右交互にできて、横へ押す(カルマン渦)。
+    // 渦の出る速さは ストローハル数 0.2 × 速さ ÷ 羽根の幅
+    shed += 2 * Math.PI * 0.2 * rv / (L * 0.45) * dt;
+    const side = Math.sin(shed);
+    ax += side * rv * 0.8 * flat;
+    // 傾いたまま落ちると、低い側(根元)へ滑る
+    ax += -sx * Math.max(P.vy, 0) * 0.6 * flat;
+    // 回転: 重い根元が下に戻ろうとする力 + 渦の押し + 先端と根元の風の差 + 粘り
+    const px = cy, py = sx;
+    const relTip = (utx - P.vx) * px + (uty - P.vy) * py, relBase = (ubx - P.vx) * px + (uby - P.vy) * py;
+    let tq = -Math.sin(P.th) * 2.4 + side * rv * 0.018 + (relTip - relBase) * 0.02 - P.om * 1.6;
+    P.phid += ((rv * 0.004) * (prng() - 0.4) - P.phid * 0.3) * dt * 6;
+    P.phi += P.phid * dt;
+
+    // 床。いったん横たわったら、強い風が来るまでそこにいる
+    const ext = Math.abs(cy) * half * 0.92 + 4;
+    if (landed && (uy < -45 || Math.hypot(ux, uy) > 140)) { landed = false; P.vy = Math.min(P.vy, uy * 0.4); }
+    if (!landed && P.y + ext >= floor && P.vy >= 0) landed = true;
+    if (landed) {
+      const target = P.th >= 0 ? Math.PI / 2 * 0.95 : -Math.PI / 2 * 0.95;
+      tq = (target - P.th) * 2 - P.om * 3;
+      P.vy = 0; ay = 0;
+      ax = Math.hypot(ux, uy) > 30 ? ax * 0.25 : 0;
+      P.vx *= Math.pow(0.03, dt);
+      P.phi += (0 - P.phi) * Math.min(1, dt * 2);
+    }
+    P.om += tq * dt; P.th += P.om * dt;
+    P.vx += ax * dt; P.vy += ay * dt;
+    P.x += P.vx * dt; P.y += P.vy * dt;
+    if (landed) P.y = floor - (Math.abs(Math.cos(P.th)) * half * 0.92 + 4);
+    // 左右の壁でやわらかく跳ね返る
+    if (P.x < 24) { P.x = 24; P.vx = Math.abs(P.vx) * 0.4; }
+    if (P.x > W - 24) { P.x = W - 24; P.vx = -Math.abs(P.vx) * 0.4; }
+    if (P.y < -L) { P.y = -L; P.vy = Math.abs(P.vy) * 0.3; }
+    return landed;
+  }
+  function render(){
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const sw = sprite.width / dpr, shh = sprite.height / dpr;
+    const sx = 0.38 + 0.62 * Math.abs(Math.cos(P.phi));
+    // 影: 床から離れるほど、ずれて薄く大きくなる
+    const height = Math.max(0, floor - P.y - L * 0.2);
+    const off = 6 + height * 0.06, a = Math.max(0.05, 0.22 - height * 0.0004);
+    ctx.save(); ctx.globalAlpha = a;
+    ctx.translate(P.x + off * 0.6, P.y + off); ctx.rotate(P.th); ctx.scale(sx * (1 + height * 0.0006), 1 + height * 0.0006);
+    ctx.drawImage(shadow, -sw * 0.5, -shh * 0.92 + L * 0.5, sw, shh);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(P.x, P.y); ctx.rotate(P.th); ctx.scale(sx, 1);
+    ctx.drawImage(sprite, -sw * 0.5, -shh * 0.92 + L * 0.5, sw, shh);
+    ctx.restore();
+  }
+
+  // 指やカーソルの動きが、そのまま空気の流れになる
+  let lastP = null;
+  function addPuff(x, y, vx, vy, r){
+    const sp = Math.hypot(vx, vy), cap = 900;           // 強すぎる風は抑える
+    if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
+    puffs.push({ x, y, vx, vy, r, t: clock }); if (puffs.length > 40) puffs.shift(); wake(); }
+  hero.addEventListener('pointermove', e => {
+    const r = hero.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
+    if (lastP) {
+      const dt = Math.max(8, now - lastP.t) / 1000;
+      const vx = (x - lastP.x) / dt, vy = (y - lastP.y) / dt;
+      const sp = Math.hypot(vx, vy);
+      if (sp > 30) addPuff(x, y, vx * 0.55, vy * 0.55, 110);
+    }
+    lastP = { x, y, t: now };
+  }, { passive: true });
+  hero.addEventListener('pointerleave', () => { lastP = null; });
+  // 羽根の近くを軽く押すと、下から息を吹きかけたようにふわりと上がる
+  hero.addEventListener('pointerdown', e => {
+    const r = hero.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const d = Math.hypot(x - P.x, y - P.y);
+    if (d < L * 1.6) addPuff(P.x + (P.x - x) * 0.3, P.y + L * 0.6, (P.x - x) * 1.2, -420, 160);
+  });
+
+  let clock = 0, running = false, heroOn = true, still = 0, lastT = 0;
+  function wake(){ still = 0; if (!running && heroOn && !reduce) { running = true; lastT = performance.now(); requestAnimationFrame(loop); } }
+  function loop(now){
+    const dt = Math.min((now - lastT) / 1000, 1 / 30); lastT = now;
+    const sub = 3;
+    let rest = false;
+    for (let i = 0; i < sub; i++) { clock += dt / sub; rest = step(dt / sub, clock); }
+    while (puffs.length && clock - puffs[0].t > 4) puffs.shift();
+    render();
+    still = rest && Math.abs(P.vx) < 0.5 && Math.abs(P.om) < 0.02 && !puffs.length ? still + dt : 0;
+    if (still > 1.2 || !heroOn) { running = false; return; }   // 床で落ち着いたら止める
+    requestAnimationFrame(loop);
+  }
+  new IntersectionObserver(es => { heroOn = es[0].isIntersecting; if (heroOn) wake(); }).observe(hero);
+
+  function start(){
+    resize();
+    P.x = W * (innerWidth < 768 ? 0.36 : 0.5); P.y = H * 0.1;
+    if (reduce) {
+      // 動きを減らす設定では、床に横たわった羽根を一枚置くだけ
+      P.th = 1.38; P.phi = 0; P.y = floor - 8; P.x = W * 0.5;
+      render(); return;
+    }
+    // 画面写真用: ?t=秒 でその時刻まで進めておく
+    const ff = parseFloat(params.get('t') || '0');
+    for (let t = 0; t < ff; t += 1 / 180) { clock += 1 / 180; step(1 / 180, clock); }
+    if (params.has('puff')) addPuff(P.x - 60, P.y + 40, 260, -320, 160);
+    render(); wake();
+  }
+  addEventListener('resize', () => {
+    if (hero.clientWidth === W && hero.clientHeight === H && Math.min(devicePixelRatio || 1, 2) === dpr) return;
+    const ox = P.x / W, oy = P.y / H; resize(); P.x = ox * W;
+    P.y = landed ? floor - (Math.abs(Math.cos(P.th)) * L * 0.5 * 0.92 + 4) : Math.min(oy * H, floor);
+    render();
+  });
+  start();
+
+  /* ---------- 羊 ----------
+     最初は軽い静止画を置き、ページを読み終えてから動く部品を読む。
+     初めて現れた時に一度だけ手を振り、そのあとは落ちてくる羽根を目で追う。
+     羽根が床で落ち着くと、正面に戻ってまばたきする。押すと羽を広げて浮く。 */
+  const nest = document.querySelector('.sheep');
+  let pet = null, busy = false, lastDir = null, settled = 0, prevX = 0, prevY = 0;
+  function once(state){
+    if (!pet || reduce) return;
+    busy = true; lastDir = null;
+    pet.play(state);
+  }
+  let gazing = false, sheepSeen = true;
+  new IntersectionObserver(es => { sheepSeen = es[0].isIntersecting; if (sheepSeen && pet && !reduce && !gazing) { gazing = true; requestAnimationFrame(gaze); } }).observe(nest);
+  function gaze(){
+    if (!pet || reduce || !sheepSeen) { gazing = false; return; }
+    const hr = hero.getBoundingClientRect(), r = nest.getBoundingClientRect();
+    const cx = r.left - hr.left + r.width * 0.5, cy = r.top - hr.top + r.height * 0.32;   // 目のあたり
+    const moving = Math.hypot(P.x - prevX, P.y - prevY) > 0.3; prevX = P.x; prevY = P.y;
+    settled = moving ? 0 : settled + 1;
+    if (!busy) {
+      const dx = P.x - cx, dy = P.y - cy, near = Math.hypot(dx, dy) < r.width * 0.55;
+      const dir = near || settled > 150 ? null : Math.round(((Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360) / 22.5) % 16;
+      if (dir !== lastDir) { pet.look(dir === null ? null : dir * 22.5); lastDir = dir; }
+    }
+    requestAnimationFrame(gaze);
+  }
+  async function wakeSheep(){
+    try {
+      await import('./assets/mascot-3d/hitsujiplume-mascot-3d.js');
+      const el = document.createElement('hitsujiplume-mascot-3d');
+      el.setAttribute('size', String(Math.round(nest.clientWidth)));
+      el.setAttribute('label', '羊のぷるーむ');
+      el.addEventListener('mascot-finished', () => { busy = false; lastDir = null; });
+      nest.append(el);
+      await el.ready;
+      pet = el; nest.classList.add('live');
+      if (!reduce) { once('waving'); gazing = true; requestAnimationFrame(gaze); }
+    } catch { /* 読めなければ静止画のまま */ }
+  }
+  if (reduce) { nest.tabIndex = -1; nest.setAttribute('aria-hidden', 'true'); nest.style.cursor = 'default'; }
+  else nest.addEventListener('click', () => once('jumping'));
+  if (document.readyState === 'complete') setTimeout(wakeSheep, 300);
+  else addEventListener('load', () => setTimeout(wakeSheep, 300), { once: true });
+})();
+</script>
+</body>
+</html>
