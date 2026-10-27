@@ -76,7 +76,7 @@ main,header,footer{position:relative;z-index:1}
 
 /* ---------- ヘッダー ---------- */
 .top{
-  position:absolute;top:0;left:0;right:0;
+  position:absolute;top:0;left:0;right:0;z-index:2;  /* 後に来るヒーローに覆われてリンクが押せなくならないよう、手前に出す */
   padding-top:max(22px, env(safe-area-inset-top));
 }
 .top .shell{display:flex;align-items:center;justify-content:space-between;min-height:48px}
@@ -84,8 +84,6 @@ main,header,footer{position:relative;z-index:1}
   font-family:var(--font-round);font-weight:700;
   font-size:1.0625rem;letter-spacing:.06em;text-decoration:none;
 }
-.top nav a{font-size:.875rem;color:var(--muted);text-decoration:none}
-.top nav a:hover{color:var(--text)}
 
 /* ---------- ヒーロー ---------- */
 .hero{
@@ -330,7 +328,6 @@ main,header,footer{position:relative;z-index:1}
 <header class="top">
   <div class="shell">
     <a class="brand" href="../">ひつじぷるーむ</a>
-    <nav aria-label="補足"><a href="https://yama2inu.github.io/mirarm-help/">ヘルプ</a></nav>
   </div>
 </header>
 
